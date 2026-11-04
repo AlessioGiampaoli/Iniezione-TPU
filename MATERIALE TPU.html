@@ -1,0 +1,580 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Archivio Diba</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: un percorso a tre passi (articolo, colore, ricetta) con grandi aree da toccare. La ricetta mette i chili in evidenza. */
+:root{
+  --bg:#EDF1F3;
+  --surface:#FFFFFF;
+  --surface-2:#F4F7F8;
+  --ink:#14202A;
+  --muted:#566673;
+  --line:#D2DBE0;
+  --accent:#0B6B66;
+  --accent-ink:#FFFFFF;
+  --accent-soft:#DCEEEC;
+  --warn:#7A4A00;
+  --warn-soft:#FFF0D2;
+  --err:#B3261E;
+  --err-soft:#FBE6E4;
+  --focus:#1B6FD1;
+  --font-display:'Barlow Condensed','Arial Narrow',sans-serif;
+  --font-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --font-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0D1418;
+    --surface:#141D23;
+    --surface-2:#1A252C;
+    --ink:#E4EBEF;
+    --muted:#93A3AE;
+    --line:#27353D;
+    --accent:#4DC4B8;
+    --accent-ink:#06211F;
+    --accent-soft:#14312F;
+    --warn:#FFC266;
+    --warn-soft:#3A2A0E;
+    --err:#FF8F86;
+    --err-soft:#3A1D1B;
+    --focus:#7DB4FF;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0D1418;
+  --surface:#141D23;
+  --surface-2:#1A252C;
+  --ink:#E4EBEF;
+  --muted:#93A3AE;
+  --line:#27353D;
+  --accent:#4DC4B8;
+  --accent-ink:#06211F;
+  --accent-soft:#14312F;
+  --warn:#FFC266;
+  --warn-soft:#3A2A0E;
+  --err:#FF8F86;
+  --err-soft:#3A1D1B;
+  --focus:#7DB4FF;
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.5 var(--font-body);
+  padding-block:16px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.app{max-width:1000px;margin:0 auto}
+.app>*{min-width:0}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+.bar{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 12px;padding-bottom:12px;margin-bottom:20px;border-bottom:1px solid var(--line)}
+.brand{font:600 22px/1 var(--font-display);text-transform:uppercase;letter-spacing:.05em;text-decoration:none;color:var(--ink)}
+.bar-sub{color:var(--muted);font-size:14px}
+
+.hero h1{font-size:clamp(32px,7vw,52px);line-height:1.02;text-transform:uppercase;letter-spacing:.01em}
+.hero .sub{color:var(--muted);margin:6px 0 16px}
+input[type="search"],input[type="text"],input[type="number"]{
+  width:100%;min-height:56px;padding:0 16px;border:1.5px solid var(--line);border-radius:8px;
+  background:var(--surface);color:var(--ink);font:18px var(--font-body);
+}
+input[type="search"]:focus,input[type="text"]:focus{border-color:var(--accent)}
+.sec{font-size:22px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:24px 0 10px}
+.count{color:var(--muted);font-size:14px;margin:16px 0 10px}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:10px}
+.tile,.vt{
+  display:flex;text-decoration:none;color:var(--ink);background:var(--surface);
+  border:1px solid var(--line);border-radius:8px;min-width:0;
+}
+.tile{flex-direction:column;justify-content:center;gap:4px;min-height:88px;padding:14px 16px}
+.tile:hover,.vt:hover{border-color:var(--accent)}
+.t-name{font:600 24px/1.1 var(--font-display);text-transform:uppercase;letter-spacing:.02em;overflow-wrap:anywhere}
+.t-meta{color:var(--muted);font-size:14px}
+
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:10px;margin-top:14px}
+.vt{align-items:center;gap:12px;min-height:68px;padding:10px 14px}
+.vt-main{display:flex;flex-direction:column;min-width:0}
+.vt-name{font-weight:600;font-size:18px;line-height:1.2;overflow-wrap:anywhere}
+.vt-sub{color:var(--muted);font-size:14px;overflow-wrap:anywhere}
+.sw{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);box-shadow:inset 0 0 0 2px var(--surface)}
+.sw.none{background:var(--surface-2)}
+
+.back{display:inline-flex;align-items:center;min-height:48px;color:var(--accent);font-weight:600;text-decoration:none;margin-bottom:4px}
+.back:hover{text-decoration:underline}
+.h-art{font-size:clamp(32px,7vw,52px);line-height:1.02;text-transform:uppercase}
+.a-meta{color:var(--muted);margin:4px 0 14px}
+
+.eyebrow{font:500 13px var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.rtitle{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;font-size:clamp(38px,9vw,64px);line-height:1;text-transform:uppercase;margin:4px 0 16px}
+.rtitle .sw{width:36px;height:36px}
+.codechip{font:500 18px/1 var(--font-mono);letter-spacing:0;padding:6px 10px;border:1.5px solid var(--line);border-radius:6px;color:var(--muted)}
+
+.calc{display:flex;align-items:center;flex-wrap:wrap;gap:10px 14px;padding:12px 16px;margin-bottom:16px;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.calc label{font-weight:600}
+.calc input{width:130px;min-height:48px;font-size:20px}
+.calc .hint{color:var(--muted);font-size:14px;flex:1 1 220px}
+
+.part{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin-bottom:16px}
+.part-h{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;padding:14px 16px}
+.part-h h3{font-size:30px;text-transform:uppercase;letter-spacing:.02em}
+.chip{font:500 12px/1 var(--font-mono);padding:5px 8px;border:1px solid var(--line);border-radius:4px;color:var(--muted);white-space:nowrap}
+.master{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 16px;padding:12px 16px;background:var(--accent-soft);border-top:1px solid var(--line)}
+.m-label{font:500 11px var(--font-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.m-name{font-weight:600;font-size:20px;line-height:1.25;overflow-wrap:anywhere}
+.m-pct{font:600 36px/1 var(--font-display);color:var(--accent)}
+.alert{padding:12px 16px;background:var(--warn-soft);color:var(--warn);border-top:1px solid var(--line);font-size:15px}
+.alert strong{display:block}
+.alert ul{margin:6px 0 0;padding-left:20px}
+
+.mrow{
+  display:grid;grid-template-columns:minmax(0,1fr) 64px repeat(var(--n,1),minmax(104px,132px));
+  gap:0 14px;align-items:center;padding:12px 16px;border-top:1px solid var(--line);
+}
+.mrow.head{padding-block:9px;font:500 11px/1.2 var(--font-mono);text-transform:uppercase;letter-spacing:.07em;color:var(--muted);background:var(--surface-2)}
+.mrow.master-row{background:var(--accent-soft)}
+.mrow.total{background:var(--surface-2)}
+.mname{font-weight:600;font-size:18px;line-height:1.25;overflow-wrap:anywhere}
+.tag{display:inline-block;margin-left:8px;vertical-align:middle;font:500 11px/1 var(--font-mono);text-transform:uppercase;letter-spacing:.06em;padding:4px 6px;border:1px solid currentColor;border-radius:4px;color:var(--accent)}
+.tag.add{color:var(--warn)}
+.np,.nk{text-align:right;font-variant-numeric:tabular-nums}
+.np .v{font-size:16px;color:var(--muted)}
+.nk .v{font:600 30px/1 var(--font-display)}
+.nk .u{margin-left:4px;font-size:13px;color:var(--muted)}
+.nk .calc-tag{display:block;font:500 10px var(--font-mono);color:var(--warn);text-transform:uppercase}
+.l{display:none}
+.total .nk .v{font-size:26px}
+
+.orig{border-top:1px solid var(--line);padding:0 16px}
+.orig summary{display:flex;align-items:center;min-height:48px;cursor:pointer;color:var(--muted);font-size:14px}
+.orig dl{margin:0 0 12px}
+.orig dt{font:500 11px var(--font-mono);text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.orig dd{margin:2px 0 10px;font:13px/1.45 var(--font-mono);overflow-wrap:anywhere}
+.none{padding:16px;color:var(--muted)}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 18px;border-radius:8px;
+  border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);
+  font:600 15px/1 var(--font-body);cursor:pointer;
+}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.admin{margin-top:36px;border-top:1px solid var(--line);padding-top:8px}
+.admin summary{display:flex;align-items:center;min-height:48px;cursor:pointer;color:var(--muted)}
+.admin-body{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:4px 0 8px;color:var(--muted);font-size:14px}
+.admin-body p{max-width:60ch}
+.admin-body .row{display:flex;flex-wrap:wrap;gap:10px}
+.status{padding:10px 14px;border-radius:6px;background:var(--accent-soft);color:var(--ink);overflow-wrap:anywhere}
+.status:empty{display:none}
+.status.err{background:var(--err-soft);color:var(--err)}
+.foot{margin-top:28px;color:var(--muted);font-size:13px}
+
+@media (max-width:640px){
+  .mrow{grid-template-columns:repeat(calc(var(--n,1) + 1),minmax(0,1fr));gap:8px 12px}
+  .mrow.head{display:none}
+  .mn{grid-column:1/-1}
+  .np,.nk{text-align:left}
+  .l{display:block;font:500 10.5px/1.2 var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:2px}
+  .nk .v{font-size:28px}
+  .m-pct{font-size:32px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app">
+  <header class="bar">
+    <a class="brand" href="#home">Archivio Diba</a>
+    <span class="bar-sub">Miscelazione TPU per presse</span>
+  </header>
+  <main id="main"></main>
+  <footer id="foot" class="foot"></footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+(function(){
+  var KEY = 'archivio-diba-prod-v1';
+  var SEED = {"name":"MISCELAZIONE TPU PER PRESSE","R":{"headers":["Articolo","Codice stampo","Parte","Colore","Cod. colore","Marca master","Master","% master","Miscela","Pesi (base)","Pesi per miscelatore","Anomalie"],"rows":[["TROPEA ZEGNA","3722","Suola","BIANCO","771","IMACO","IMACO BIANCO 950R",12.0,"100% COIM LARIPUR 7018KB + 12% MASTER BIANCO 950R","25 KG COIM LARIPUR 7018KB + 3 KG MASTER BIANCO 950R","100 KG COIM LARIPUR 7018KB + 12 KG MASTER BIANCO 950R",""],["TROPEA ZEGNA","3722","Spoiler","BIANCO","771","IMACO","IMACO BIANCO 950R",8.0,"100% COIM LARIPUR 8518B + 8% MASTER BIANCO 950R","25 KG COIM LARIPUR 8518B + 2 KG MASTER BIANCO 950R","",""],["TROPEA ZEGNA","3722","Suola","FAGGIO","724","IMACO","IMACO MARRONE 387R",4.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 4% MASTER MARRONE 387R","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER MARRONE 387R","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 5,0 KG MASTER MARRONE 387R",""],["TROPEA ZEGNA","3722","Spoiler","FAGGIO","724","IMACO","IMACO MARRONE 387R",4.0,"100% COIM LARIPUR 8518B + 4% MASTER MARRONE 387R","25 KG COIM LARIPUR 8518B + 1,0 KG MASTER MARRONE 387R","",""],["TROPEA ZEGNA","3722","Suola","DAINO","729","IMACO","IMACO BEIGE 156N",4.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 4% MASTER BEIGE 156N","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER BEIGE 156N","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 5,0 KG MASTER BEIGE 156N",""],["TROPEA ZEGNA","3722","Spoiler","DAINO","729","IMACO","IMACO BEIGE 156N",4.0,"100% COIM LARIPUR 8518B + 4% MASTER BEIGE 156N","25 KG COIM LARIPUR 8518B + 1,0 KG MASTER BEIGE 156N","",""],["TROPEA ZEGNA","3722","Suola","PIAZZO","723","IMACO","IMACO MARRONE 003P",3.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 3% MASTER MARRONE 003P","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 0,94 KG MASTER MARRONE 003P","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 3,75 KG MASTER MARRONE 003P",""],["TROPEA ZEGNA","3722","Spoiler","PIAZZO","723","IMACO","IMACO MARRONE 003P",3.0,"100% COIM LARIPUR 8518B + 3% MASTER MARRONE 003P","25 KG COIM LARIPUR 8518B + 0,750 KG MASTER MARRONE 003P","",""],["TROPEA ZEGNA","3722","Suola","AMARO","774","REVO","REVO MARRONE BW0239",4.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 4% MASTER MARRONE BW0239","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER MARRONE BW0239","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 5,0 KG MASTER MARRONE BW0239",""],["TROPEA ZEGNA","3722","Spoiler","AMARO","774","REVO","REVO MARRONE BW0239",4.0,"90% COIM LARIPUR 8518B + 10% APILON 52 DP1805 + 4% MASTER MARRONE BW0239","25 KG COIM LARIPUR 8518B + 2,77 KG APILON 52 DP1805 + 1,110 KG MASTER MARRONE BW0239","",""],["TROPEA ZEGNA","3722","Suola","SERRA","775","REVO","REVO MARRONE BK0063",5.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 5% MASTER MARRONE BK0063","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,560 KG MASTER MARRONE BK0063","100 KG COIM LARIPUR 7518qB + 25 KG APILON 52 DP1805 + 6,250 KG MASTER MARRONE BK0063","Pesi per miscelatore: \"COIM LARIPUR 7518qB\" invece di \"COIM LARIPUR 7518B\""],["TROPEA ZEGNA","3722","Spoiler","SERRA","775","REVO","REVO MARRONE BK0063",5.0,"100% COIM LARIPUR 8518B + 5% MASTER MARRONE BK0063","25 KG COIM LARIPUR 8518B + 2,77 KG APILON 52 DP1805 + 1,250 KG MASTER MARRONE BK0063","","Pesi: 3 componenti contro 2 nella miscela"],["DUNE FERRAGAMO","1169","Suola","MASCARPONE","681","TRINSEO","TRINSEO BEIGE R038 S60",5.0,"50% APILON DP3322/65A + 50% APILON DP3322/85A + 5% MASTER BEIGE R038 S60","25 KG APILON DP3322/65A + 25 KG APILON DP3322/85A + 2,5 KG MASTER BEIGE R038 S60","100 KG APILON DP3322/65A + 100 KG APILON DP3322/85A + 10 KG MASTER BEIGE R038 S60",""],["DUNE FERRAGAMO","1169","Suola","BIANCO","256+19","API","API BIANCO L746 (2%) + API BIANCO E211 (8%)",10.0,"50% APILON DP3322/65A + 50% APILON DP3322/85A + 2% MASTER BIANCO L746 + 8% MASTER BIANCO E211","25 KG APILON DP3322/65A + 25 KG APILON DP3322/85A + 1,0 KG MASTER BIANCO L746 + 4,0 KG MASTER BIANCO E211","100 KG APILON DP3322/65A + 100 KG APILON DP3322/85A + 4,0 KG MASTER BIANCO L746 + 4,0 KG MASTER BIANCO E211","Pesi per miscelatore: MASTER BIANCO E211 4 kg, atteso circa 16 kg"],["DUNE FERRAGAMO","1169","Suola","NERO","215","IMACO","IMACO NERO",5.0,"50% APILON DP3322/65A + 50% APILON DP3322/85A + 5% MASTER NERO 215","25 KG APILON DP3322/65A + 25 KG APILON DP3322/85A + 2,5 KG MASTER NERO 215","100 KG APILON DP3322/65A + 100 KG APILON DP3322/85A + 10 KG MASTER NERO 215",""],["DUNE FERRAGAMO","1169","Suola","GRIGIO","679","API","API GRIGIO",5.0,"50% APILON DP3322/65A + 50% APILON DP3322/85A + 5% MASTER GRIGIO 679","25 KG APILON DP3322/65A + 25 KG APILON DP3322/85A + 2,5 KG MASTER GRIGIO 679","100 KG APILON DP3322/65A + 100 KG APILON DP3322/85A + 10 KG MASTER GRIGIO 679",""],["ECHAPEE BERLUTI","1078","Suola","GRIGIO","539","API","API GRIGIO I160",3.0,"60% APILON 52 A-7505 + 40% APILON 52 DP1805 + 3% MASTER GRIGIO I160","25 KG APILON 52 A-7505 + 16,660 KG APILON 52 DP1805 + 1,23 KG MASTER GRIGIO I160","100 KG APILON DP3322/65A + 66,660 KG APILON DP3322/85A + 4,920 KG MASTER GRIGIO I160","Pesi per miscelatore: \"APILON DP3322/65A\" invece di \"APILON 52 A-7505\" | Pesi per miscelatore: \"APILON DP3322/85A\" invece di \"APILON 52 DP1805\""],["ECHAPEE BERLUTI","1078","Suola","NERO","98","TRINSEO","TRINSEO NERO 98",3.0,"60% APILON 52 A-7505 + 40% APILON 52 DP1805 + 3% MASTER NERO 98","25 KG APILON 52 A-7505 + 16,660 KG APILON 52 DP1805 + 1,23 KG MASTER NERO 98","100 KG APILON DP3322/65A + 66,660 KG APILON DP3322/85A + 4,920 KG MASTER NERO 98","Pesi per miscelatore: \"APILON DP3322/65A\" invece di \"APILON 52 A-7505\" | Pesi per miscelatore: \"APILON DP3322/85A\" invece di \"APILON 52 DP1805\""],["MARATHON SPEED GOLDEN GOOSE","1220","Suola","AMBRA","","IMACO","IMACO PARA 316S",5.0,"100% APAN MH70Y + 5% MASTER PARA 316S","25 KG APAN MH70Y + 1,250 KG MASTER PARA 316S","100 KG APAN MH70Y + 5,0 KG MASTER PARA 316S",""],["STOCKING THE ROW","1238","Suola","NERO","98","API","API NERO 98",3.0,"50% REVOPURE 2085 + 50% REVOPURE 2065 + 3% MASTER NERO 98","25 KG REVOPURE 2085 + 25 KG REVOPURE 2065 + 1,5 KG MASTER NERO 98","100 KG REVOPURE 2085 + 100 KG REVOPURE 2065 + 6 KG MASTER NERO 98",""],["CITY GIVENCHY","994","Suola","BIANCO","256/19","API","API BIANCO L746 (2%) + API BIANCO E211 (6%)",8.0,"75% DP3322/85A + 25% DP3322/65A + 2% API BIANCO L746 + 6% API BIANCO E211","25 KG DP3322/85A + 8,33 KG DP3322/65A + 0,660 KG API BIANCO L746 + 1,99 KG API BIANCO E211","100 KG DP3322/85A + 33,32 KG DP3322/65A + 2,640 KG API BIANCO L746 + 8,0 KG API BIANCO E211",""],["INSERTI DUPLO HERMES","","Inserto","NERO","215","IMACO","IMACO NERO",5.0,"70% REVOPURE 2085 + 30% REVOPURE 2065 + 5% IMACO NERO","25 KG REVOPURE 2085 + 10,710 KG REVOPURE 2065 + 1,750 KG IMACO NERO","",""],["INSERTI DUPLO HERMES","","Inserto","MIELE","354","","MIELE",5.0,"70% REVOPURE 2085 + 30% REVOPURE 2065 + 5% MIELE","25 KG REVOPURE 2085 + 10,710 KG REVOPURE 2065 + 1,750 KG MIELE","",""],["TROPEA ZEGNA","3722","Suola","FELCE","942","IMACO","IMACO VERDE 516S",4.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 4% MASTER VERDE 516S","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER VERDE 516S","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 5 KG MASTER VERDE 516S",""],["TROPEA ZEGNA","3722","Spoiler","FELCE","942","IMACO","IMACO VERDE 516S",4.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 4% MASTER VERDE 516S","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER VERDE 516S","",""],["TROPEA ZEGNA","3722","Suola","DEMITASSE","940","IMACO","IMACO MARRONE 390K",6.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 6% MASTER MARRONE 390K","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,875 KG MASTER MARRONE 390K","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 7,5 KG MASTER MARRONE 390K",""],["TROPEA ZEGNA","3722","Spoiler","DEMITASSE","940","IMACO","IMACO MARRONE 390K",3.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 3% MASTER MARRONE 390K","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 0,94 KG MASTER MARRONE 390K","",""],["TROPEA ZEGNA","3722","Suola","CORDA","941","IMACO","IMACO BEIGE 470S",6.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 6% MASTER BIEGE 470S","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,875 KG MASTER BIEGE 470S","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 7,5 KG MASTER BIEGE 470S",""],["TROPEA ZEGNA","3722","Spoiler","CORDA","941","IMACO","IMACO BEIGE 470S",6.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 6% MASTER BIEGE 470S","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1,875 KG MASTER BIEGE 470S","",""],["TROPEA ZEGNA","3722","Suola","ARDESIA LAVATO BIS","939","IMACO","IMACO VERDE 808S",4.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 4% MASTER VERDE 808S","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER VERDE 808S","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 5 KG MASTER VERDE 808S",""],["TROPEA ZEGNA","3722","Spoiler","ARDESIA LAVATO BIS","939","IMACO","IMACO VERDE 808S",4.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 4% MASTER VERDE 808S","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER VERDE 808S","",""],["CASHMERE DIOR","1256","Suola","AMBRA","487","APICOLOR","APICOLOR 65 MARRONE TR. P175",10.0,"50% APILON DP3322/65A + 50% APILON DP3322/85A + 10% MASTER APICOLOR MARRONE P175","25 KG APILON DP3322/65A + 25 KG APILON DP3322/85A + 5,0 KG MASTER APICOLOR MARRONE P175","50 KG APILON DP3322/65A + 50 KG APILON DP3322/85A + 10 KG MASTER APICOLOR MARRONE P175",""],["ISOLE CASHMERE DIOR","1256","Isole","BEIGE","799","APICOLOR","APICOLOR 65/F AVORIO 0034",5.0,"30% DESMOPAN 192 + 70% APILON DP3322/85A + 5% MASTER APICOLOR AVORIO 0034","10,71 KG DESMOPAN 192+ 25 KG APILON DP3322/85A + 1,79 KG MASTER APICOLOR AVORIO 0034","42,85 KG DESMOPAN 192 + 100 KG APILON DP3322/85A + 7,15 KG MASTER APICOLOR AVORIO 0034",""],["TROPEA ZEGNA","3722","Suola","WOOD BIS","1048","IMACO","IMACO MARRONE 809S",4.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 4% MASTER MARRONE 809S","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER MARRONE 809S","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 5 KG MASTER MARRONE 809S",""],["TROPEA ZEGNA","3722","Spoiler","WOOD BIS","1048","IMACO","IMACO MARRONE 809S",4.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 4% MASTER MARRONE 809S","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER MARRONE 809S","",""],["TROPEA ZEGNA","3722","Suola","TORBA","1050","IMACO","IMACO MARRONE 102T",6.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 6% MASTER MARRONE 102T","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,875 KG MASTER MARRONE 102T","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 7,5 KG MASTER MARRONE 102T",""],["TROPEA ZEGNA","3722","Spoiler","TORBA","1050","IMACO","IMACO MARRONE 102T",6.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 6% MASTER MARRONE 102T","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1,875 KG MASTER MARRONE 102T","",""],["TROPEA ZEGNA","3722","Suola","PIETRA OASI","1051","IMACO","IMACO GRIGIO 076T",4.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 4% MASTER GRIGIO 076T","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER GRIGIO 076T","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 5 KG MASTER GRIGIO 076T",""],["TROPEA ZEGNA","3722","Spoiler","PIETRA OASI","1051","IMACO","IMACO GRIGIO 076T",4.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 4% MASTER GRIGIO 076T","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER GRIGIO 076T","",""],["TROPEA ZEGNA","3722","Suola","MIELE","1074","IMACO","IMACO BEIGE 083T",6.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 6% MASTER BEIGE 083T","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,875 KG MASTER BEIGE 083T","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 7,5 KG MASTER BEIGE 083T",""],["TROPEA ZEGNA","3722","Spoiler","MIELE","1074","IMACO","IMACO BEIGE 083T",6.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 6% MASTER BEIGE 083T","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1,875 KG MASTER BEIGE 083T","",""],["TROPEA ZEGNA","3722","Suola","GIANDUIA","1073","IMACO","IMACO MARRONE 070T",3.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 3% MASTER MARRONE 070T","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 0,94 KG MASTER MARRONE 070T","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 3,75 KG MASTER MARRONE 070T",""],["TROPEA ZEGNA","3722","Spoiler","GIANDUIA","1073","IMACO","IMACO MARRONE 070T",3.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 3% MASTER MARRONE 070T","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 0,94 KG MASTER MARRONE 070T","",""],["TROPEA ZEGNA","3722","Suola","VELVET DENIM","1072","IMACO","IMACO BLU 097T",3.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 3% MASTER BLU 097T","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 0,94 KG MASTER BLU 097T","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 3,75 KG MASTER BLU 097T",""],["TROPEA ZEGNA","3722","Spoiler","VELVET DENIM","1072","IMACO","IMACO BLU 097T",3.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 3% MASTER BLU 097T","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 0,94 KG MASTER BLU 097T","",""],["DUPLO HERMES","","Inserto","NERO","215","IMACO","IMACO NERO",5.0,"75% REVOPURE 2085 + 25% REVOPURE 2065 + 5% MASTER NERO 215","7,5 KG REVOPURE 2085 + 2,5 KG REVOPURE 2065 + 0,5 KG MASTER NERO 215","25 KG REVOPURE 2085 + 8,33 KG REVOPURE 2065 + 1,6 KG MASTER NERO 215","Pesi per miscelatore: MASTER NERO 215 1,6 kg, atteso circa 1,666 kg"],["DAY MASTER D&G","754","Inserto","NERO","215","IMACO","IMACO NERO 380I",5.0,"50% DP3322/85A + 50% DP3322/65A + 5% MASTER NERO 215","5 KG DP3322/85A + 5 KG DP3322/65A + 0,5 KG MASTER NERO 215","50 KG DP3322/85A + 50 KG DP3322/65A + 5,0 KG MASTER NERO 215",""],["MARATHON SPEED GOLDEN GOOSE MF85","1220","Suola","AMBRA","","IMACO","IMACO PARA 316S",5.0,"100% APAN MF85 + 5% MASTER PARA 316S","25 KG APAN MF85 + 1,250 KG MASTER PARA 316S","100 KG APAN MF85 + 5,0 KG MASTER PARA 316S",""],["MARATHON SPEED GOLDEN GOOSE MF85","1220","Suola","NERO","215","IMACO","IMACO NERO 215",5.0,"100% APAN MF85 + 5% MASTER NERO 215","25 KG APAN MF85 + 1,250 KG MASTER NERO 215","100 KG APAN MF85 + 5,0 KG MASTER NERO 215",""],["TROPEA ZEGNA","3722","Suola","MELIGA","1136","IMACO","IMACO BEIGE 084T",4.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 4% MASTER BEIGE 084T","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER BEIGE 084T","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 5 KG MASTER BEIGE 084T",""],["TROPEA ZEGNA","3722","Spoiler","MELIGA","1136","IMACO","IMACO BEIGE 084T",4.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 4% MASTER BEIGE 084T","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER BEIGE 084T","",""],["TROPEA ZEGNA","3722","Suola","ZAFFIRO","","IMACO","IMACO BLU 082T",4.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 4% MASTER BLU 082T","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER BLU 082T","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 5 KG MASTER BLU 082T",""],["TROPEA ZEGNA","3722","Spoiler","ZAFFIRO","","IMACO","IMACO BLU 082T",4.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 4% MASTER BLU 082T","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER BLU 082T","",""],["TROPEA ZEGNA","3722","Suola","CIMA","","IMACO","IMACO BEIGE 205S",8.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 8% MASTER BEIGE 205S","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 2,5 KG MASTER BEIGE 205S","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 10 KG MASTER BEIGE 205S",""],["TROPEA ZEGNA","3722","Spoiler","CIMA","","IMACO","IMACO BEIGE 205S",8.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 8% MASTER BEIGE 205S","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 2,5 KG MASTER BEIGE 205S","",""],["TROPEA ZEGNA","3722","Suola","NEBBIA","","IMACO","IMACO GRIGIO 708T",3.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 3% MASTER GRIGIO 708T","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1 KG MASTER GRIGIO 708T","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 4 KG MASTER GRIGIO 708T","Pesi: MASTER GRIGIO 708T 1 kg, atteso circa 0,938 kg | Pesi per miscelatore: MASTER GRIGIO 708T 4 kg, atteso circa 3,75 kg"],["TROPEA ZEGNA","3722","Spoiler","NEBBIA","","IMACO","IMACO GRIGIO 708T",3.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 3% MASTER GRIGIO 708T","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1 KG MASTER GRIGIO 708T","","Pesi: MASTER GRIGIO 708T 1 kg, atteso circa 0,938 kg"],["TROPEA ZEGNA","3722","Suola","PEPE","","IMACO","IMACO MARRONE 699T",6.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 6% MASTER MARRONE 699T","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,87 KG MASTER MARRONE 699T","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 7,5 KG MASTER MARRONE 699T",""],["TROPEA ZEGNA","3722","Spoiler","PEPE","","IMACO","IMACO MARRONE 699T",6.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 6% MASTER MARRONE 699T","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1,87 KG MASTER MARRONE 699T","",""],["TROPEA ZEGNA","3722","Suola","TRAFALGAR BLU BIS","","IMACO","IMACO BLU 702T",4.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 4% MASTER BLU 702T","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER BLU 702T","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 5 KG MASTER BLU 702T",""],["TROPEA ZEGNA","3722","Spoiler","TRAFALGAR BLU BIS","","IMACO","IMACO BLU 702T",4.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 4% MASTER BLU 702T","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1,25 KG MASTER BLU 702T","",""],["RYTHON GUCCI","Sport Gara","Suola","BEIGE","","COLOR SYSTEM","COLOR SYSTEM BEIGE UV 85959",5.0,"50% APILON 52 DP3322/85A + 50% APILON 52 XB-75A LIGHT CRYSTAL + 2% ANTIUV 03952 + 5% MASTER BEIGE 85959","25 KG APILON 52 DP3322/85A + 25 KG APILON 52 XB-75A LIGHT CRYSTAL + 1 KG ANTIUV 03952 + 2,5 KG MASTER BEIGE 85959","100 KG APILON 52 DP3322/85A + 100 KG APILON 52 XB-75A LIGHT CRYSTAL + 4 KG ANTIUV 03952 + 10 KG MASTER BEIGE 85959",""],["RYTHON GUCCI","Sport Gara","Suola","NERO","215","IMACOLOR","IMACOLOR NERO 380I",5.0,"50% APILON 52 DP3322/85A + 50% APILON 52 XB-75A LIGHT CRYSTAL + + 5% MASTER NERO 215","25 KG APILON 52 DP3322/85A + 25 KG APILON 52 XB-75A LIGHT CRYSTAL + 2,5 KG MASTER NERO","100 KG APILON 52 DP3322/85A + 100 KG APILON 52 XB-75A LIGHT CRYSTAL + 10 KG MASTER NERO 215",""],["NORA FENDI","1420","Suola","NERO","553","IMACOLOR","IMACOLOR NERO 010A-T",3.0,"100% REVOPURE PRM 75 + 3% MASTER NERO 553","25 KG REVOPURE PRM 75 + 0,75 KG MASTER NERO 553","125 KG REVOPURE PRM 75 + 3,75 KG MASTER NERO 553",""],["NORA FENDI","1420","Suola","AMBRA NUT","1089","REVO","REVO BW0125",5.0,"80% REVOPURE RNW 75 + 20% DP3322/85A + 5% MASTER AMBRA BW0125","25 KG REVOPURE PRM 75 + 6,25 KG DP3322/85A + 1,56 KG MASTER AMBRA BW0125","100 KG REVOPURE PRM 75 + 25 KG DP3322/85A + 6,25 KG MASTER AMBRA BW0125","Pesi: \"REVOPURE PRM 75\" invece di \"REVOPURE RNW 75\" | Pesi per miscelatore: \"REVOPURE PRM 75\" invece di \"REVOPURE RNW 75\""],["NEW RUNNER ALEXANDER MCQUEEN","BATTISTRADA + TACCO BATTISTRADA","Suola e tacco","NERO","215","IMACOLOR","IMACOLOR NERO 380I",5.0,"80% DP3322/85A + 20% APAN TMP 75 + 5% MASTER NERO 215","25 KG DP3322/85A + 6,25 KG APAN TMP 75 + 1,56 KG MASTER NERO 215","100 KG DP3322/85A + 25 KG APAN TMP 75 + 6,25 KG MASTER NERO 215",""],["SPOILER NEW RUNNER ALEXANDER MCQUEEN","BATTISTRADA + TACCO BATTISTRADA","Suola e tacco","BIANCO","19","API","API BIANCO E211",8.0,"70% DP3322/85A + 30% DP3322/65A + 8% MASTER BIANCO 19","25 KG DP3322/85A + 10,71 KG DP3322/65A + 2,86 KG MASTER BIANCO 19","100 KG DP3322/85A + 42,84 KG DP3322/65A + 11,44 KG MASTER BIANCO 19",""],["RYTHON GUCCI","Sport Gara","Suola","WHITE BAMBOO","","APICOLOR","APICOLOR BIANCO R996",5.0,"50% APILON 52 DP3322/85A + 50% APILON 52 DP3322/65A + 5% MASTER BIANCO R996","25 KG APILON 52 DP3322/85A + 25 KG APILON 52 DP3322/65A + 2,5 KG MASTER BIANCO R996","100 KG APILON 52 DP3322/85A + 100 KG APILON 52 DP3322/65A + 10 KG MASTER BIANCO R996",""],["RYTHON GUCCI","Sport Gara","Suola","STEEL","","APICOLOR","APICOLOR 65 GRIGIO I239",4.0,"50% APILON 52 DP3322/85A + 50% APILON 52 DP3322/65A + 4% MASTER GRIGIO I239","25 KG APILON 52 DP3322/85A + 25 KG APILON 52 DP3322/65A + 2 KG MASTER GRIGIO I239","100 KG APILON 52 DP3322/85A + 100 KG APILON 52 DP3322/65A + 8 KG MASTER GRIGIO I239",""],["RYTHON GUCCI","Sport Gara","Suola","BUTTERSCOTCH","","APICOLOR","APICOLOR BEIGE 5104",10.0,"50% APILON 52 DP3322/85A + 50% APILON 52 DP3322/65A + 10% MASTER BEIGE 5104","25 KG APILON 52 DP3322/85A + 25 KG APILON 52 DP3322/65A + 5 KG MASTER BEIGE 5104","100 KG APILON 52 DP3322/85A + 100 KG APILON 52 DP3322/65A + 20 KG MASTER BEIGE 5104",""],["RYTHON GUCCI","Sport Gara","Suola","BURN SATIN","","APICOLOR","APICOLOR 65 MARRONE M420",4.0,"50% APILON 52 DP3322/85A + 50% APILON 52 DP3322/65A + 4% MASTER MARRONE M420","25 KG APILON 52 DP3322/85A + 25 KG APILON 52 DP3322/65A + 2 KG MASTER MARRONE M420","100 KG APILON 52 DP3322/85A + 100 KG APILON 52 DP3322/65A + 8 KG MASTER MARRONE M420",""],["TROPEA ZEGNA","3722","Suola","CEDRO","","IMACO","IMACO MARRONE 357T",6.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 6% MASTER MARRONE 357T","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 1,87 KG MASTER MARRONE 357T","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 7,5 KG MASTER MARRONE 357T",""],["TROPEA ZEGNA","3722","Spoiler","CEDRO","","IMACO","IMACO MARRONE 357T",6.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 6% MASTER MARRONE 357T","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 1,87 KG MASTER MARRONE 357T","",""],["TROPEA ZEGNA","3722","Suola","ALGA","","IMACO","IMACO VERDE 705T",8.0,"80% COIM LARIPUR 7518B + 20% APILON 52 DP1805 + 8% MASTER VERDE 705T","25 KG COIM LARIPUR 7518B + 6,25 KG APILON 52 DP1805 + 2,5 KG MASTER VERDE 705T","100 KG COIM LARIPUR 7518B + 25 KG APILON 52 DP1805 + 10 KG MASTER VERDE 705T",""],["TROPEA ZEGNA","3722","Spoiler","ALGA","","IMACO","IMACO VERDE 705T",8.0,"80% COIM LARIPUR 8518B + 20% APILON 52 DP1805 + 8% MASTER VERDE 705T","25 KG COIM LARIPUR 8518B + 6,25 KG APILON 52 DP1805 + 2,5 KG MASTER VERDE 705T","",""],["NORA FENDI","1420","Suola","NERO TRASPARENTE","1240","REVOKROME","REVOKROME BK0058",8.0,"100% REVOPURE PRM 75 + 3% MASTER NERO 553","25 KG REVOPURE PRM 75 + 0,75 KG MASTER NERO 553","125 KG REVOPURE PRM 75 + 3,75 KG MASTER NERO 553","Percentuale master: 8% nella riga MASTER, 3% nella miscela"],["NORA FENDI","1420","Suola","VERDE TRADSPARENTE","1269","REVOKROME","REVOKROME GN0070",5.0,"80% REVOPURE RNW 75 + 20% DP3322/85A + 5% MASTER AMBRA BW0125","25 KG REVOPURE PRM 75 + 6,25 KG DP3322/85A + 1,56 KG MASTER AMBRA BW0125","100 KG REVOPURE PRM 75 + 25 KG DP3322/85A + 6,25 KG MASTER AMBRA BW0125","Il master in miscela (BW0125) non coincide con quello indicato (GN0070) | Pesi: \"REVOPURE PRM 75\" invece di \"REVOPURE RNW 75\" | Pesi per miscelatore: \"REVOPURE PRM 75\" invece di \"REVOPURE RNW 75\""]]},"M":{"headers":["Materiale","Ruolo","% in miscela","Kg (base)","Kg per miscelatore","Articolo","Codice stampo","Parte","Colore"],"rows":[["COIM LARIPUR 7018KB","Polimero",100.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","BIANCO"],["MASTER BIANCO 950R","Master",12.0,3.0,12.0,"TROPEA ZEGNA","3722","Suola","BIANCO"],["COIM LARIPUR 8518B","Polimero",100.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","BIANCO"],["MASTER BIANCO 950R","Master",8.0,2.0,"","TROPEA ZEGNA","3722","Spoiler","BIANCO"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","FAGGIO"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","FAGGIO"],["MASTER MARRONE 387R","Master",4.0,1.25,5.0,"TROPEA ZEGNA","3722","Suola","FAGGIO"],["COIM LARIPUR 8518B","Polimero",100.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","FAGGIO"],["MASTER MARRONE 387R","Master",4.0,1.0,"","TROPEA ZEGNA","3722","Spoiler","FAGGIO"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","DAINO"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","DAINO"],["MASTER BEIGE 156N","Master",4.0,1.25,5.0,"TROPEA ZEGNA","3722","Suola","DAINO"],["COIM LARIPUR 8518B","Polimero",100.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","DAINO"],["MASTER BEIGE 156N","Master",4.0,1.0,"","TROPEA ZEGNA","3722","Spoiler","DAINO"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","PIAZZO"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","PIAZZO"],["MASTER MARRONE 003P","Master",3.0,0.94,3.75,"TROPEA ZEGNA","3722","Suola","PIAZZO"],["COIM LARIPUR 8518B","Polimero",100.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","PIAZZO"],["MASTER MARRONE 003P","Master",3.0,0.75,"","TROPEA ZEGNA","3722","Spoiler","PIAZZO"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","AMARO"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","AMARO"],["MASTER MARRONE BW0239","Master",4.0,1.25,5.0,"TROPEA ZEGNA","3722","Suola","AMARO"],["COIM LARIPUR 8518B","Polimero",90.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","AMARO"],["APILON 52 DP1805","Polimero",10.0,2.77,"","TROPEA ZEGNA","3722","Spoiler","AMARO"],["MASTER MARRONE BW0239","Master",4.0,1.11,"","TROPEA ZEGNA","3722","Spoiler","AMARO"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","SERRA"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","SERRA"],["MASTER MARRONE BK0063","Master",5.0,1.56,6.25,"TROPEA ZEGNA","3722","Suola","SERRA"],["COIM LARIPUR 8518B","Polimero",100.0,"","","TROPEA ZEGNA","3722","Spoiler","SERRA"],["MASTER MARRONE BK0063","Master",5.0,"","","TROPEA ZEGNA","3722","Spoiler","SERRA"],["APILON DP3322/65A","Polimero",50.0,25.0,100.0,"DUNE FERRAGAMO","1169","Suola","MASCARPONE"],["APILON DP3322/85A","Polimero",50.0,25.0,100.0,"DUNE FERRAGAMO","1169","Suola","MASCARPONE"],["MASTER BEIGE R038 S60","Master",5.0,2.5,10.0,"DUNE FERRAGAMO","1169","Suola","MASCARPONE"],["APILON DP3322/65A","Polimero",50.0,25.0,100.0,"DUNE FERRAGAMO","1169","Suola","BIANCO"],["APILON DP3322/85A","Polimero",50.0,25.0,100.0,"DUNE FERRAGAMO","1169","Suola","BIANCO"],["MASTER BIANCO L746","Master",2.0,1.0,4.0,"DUNE FERRAGAMO","1169","Suola","BIANCO"],["MASTER BIANCO E211","Master",8.0,4.0,4.0,"DUNE FERRAGAMO","1169","Suola","BIANCO"],["APILON DP3322/65A","Polimero",50.0,25.0,100.0,"DUNE FERRAGAMO","1169","Suola","NERO"],["APILON DP3322/85A","Polimero",50.0,25.0,100.0,"DUNE FERRAGAMO","1169","Suola","NERO"],["MASTER NERO 215","Master",5.0,2.5,10.0,"DUNE FERRAGAMO","1169","Suola","NERO"],["APILON DP3322/65A","Polimero",50.0,25.0,100.0,"DUNE FERRAGAMO","1169","Suola","GRIGIO"],["APILON DP3322/85A","Polimero",50.0,25.0,100.0,"DUNE FERRAGAMO","1169","Suola","GRIGIO"],["MASTER GRIGIO 679","Master",5.0,2.5,10.0,"DUNE FERRAGAMO","1169","Suola","GRIGIO"],["APILON 52 A-7505","Polimero",60.0,25.0,100.0,"ECHAPEE BERLUTI","1078","Suola","GRIGIO"],["APILON 52 DP1805","Polimero",40.0,16.66,66.66,"ECHAPEE BERLUTI","1078","Suola","GRIGIO"],["MASTER GRIGIO I160","Master",3.0,1.23,4.92,"ECHAPEE BERLUTI","1078","Suola","GRIGIO"],["APILON 52 A-7505","Polimero",60.0,25.0,100.0,"ECHAPEE BERLUTI","1078","Suola","NERO"],["APILON 52 DP1805","Polimero",40.0,16.66,66.66,"ECHAPEE BERLUTI","1078","Suola","NERO"],["MASTER NERO 98","Master",3.0,1.23,4.92,"ECHAPEE BERLUTI","1078","Suola","NERO"],["APAN MH70Y","Polimero",100.0,25.0,100.0,"MARATHON SPEED GOLDEN GOOSE","1220","Suola","AMBRA"],["MASTER PARA 316S","Master",5.0,1.25,5.0,"MARATHON SPEED GOLDEN GOOSE","1220","Suola","AMBRA"],["REVOPURE 2085","Polimero",50.0,25.0,100.0,"STOCKING THE ROW","1238","Suola","NERO"],["REVOPURE 2065","Polimero",50.0,25.0,100.0,"STOCKING THE ROW","1238","Suola","NERO"],["MASTER NERO 98","Master",3.0,1.5,6.0,"STOCKING THE ROW","1238","Suola","NERO"],["DP3322/85A","Polimero",75.0,25.0,100.0,"CITY GIVENCHY","994","Suola","BIANCO"],["DP3322/65A","Polimero",25.0,8.33,33.32,"CITY GIVENCHY","994","Suola","BIANCO"],["API BIANCO L746","Master",2.0,0.66,2.64,"CITY GIVENCHY","994","Suola","BIANCO"],["API BIANCO E211","Master",6.0,1.99,8.0,"CITY GIVENCHY","994","Suola","BIANCO"],["REVOPURE 2085","Polimero",70.0,25.0,"","INSERTI DUPLO HERMES","","Inserto","NERO"],["REVOPURE 2065","Polimero",30.0,10.71,"","INSERTI DUPLO HERMES","","Inserto","NERO"],["IMACO NERO","Master",5.0,1.75,"","INSERTI DUPLO HERMES","","Inserto","NERO"],["REVOPURE 2085","Polimero",70.0,25.0,"","INSERTI DUPLO HERMES","","Inserto","MIELE"],["REVOPURE 2065","Polimero",30.0,10.71,"","INSERTI DUPLO HERMES","","Inserto","MIELE"],["MIELE","Master",5.0,1.75,"","INSERTI DUPLO HERMES","","Inserto","MIELE"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","FELCE"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","FELCE"],["MASTER VERDE 516S","Master",4.0,1.25,5.0,"TROPEA ZEGNA","3722","Suola","FELCE"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","FELCE"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","FELCE"],["MASTER VERDE 516S","Master",4.0,1.25,"","TROPEA ZEGNA","3722","Spoiler","FELCE"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","DEMITASSE"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","DEMITASSE"],["MASTER MARRONE 390K","Master",6.0,1.875,7.5,"TROPEA ZEGNA","3722","Suola","DEMITASSE"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","DEMITASSE"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","DEMITASSE"],["MASTER MARRONE 390K","Master",3.0,0.94,"","TROPEA ZEGNA","3722","Spoiler","DEMITASSE"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","CORDA"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","CORDA"],["MASTER BIEGE 470S","Master",6.0,1.875,7.5,"TROPEA ZEGNA","3722","Suola","CORDA"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","CORDA"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","CORDA"],["MASTER BIEGE 470S","Master",6.0,1.875,"","TROPEA ZEGNA","3722","Spoiler","CORDA"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","ARDESIA LAVATO BIS"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","ARDESIA LAVATO BIS"],["MASTER VERDE 808S","Master",4.0,1.25,5.0,"TROPEA ZEGNA","3722","Suola","ARDESIA LAVATO BIS"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","ARDESIA LAVATO BIS"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","ARDESIA LAVATO BIS"],["MASTER VERDE 808S","Master",4.0,1.25,"","TROPEA ZEGNA","3722","Spoiler","ARDESIA LAVATO BIS"],["APILON DP3322/65A","Polimero",50.0,25.0,50.0,"CASHMERE DIOR","1256","Suola","AMBRA"],["APILON DP3322/85A","Polimero",50.0,25.0,50.0,"CASHMERE DIOR","1256","Suola","AMBRA"],["MASTER APICOLOR MARRONE P175","Master",10.0,5.0,10.0,"CASHMERE DIOR","1256","Suola","AMBRA"],["DESMOPAN 192","Polimero",30.0,10.71,42.85,"ISOLE CASHMERE DIOR","1256","Isole","BEIGE"],["APILON DP3322/85A","Polimero",70.0,25.0,100.0,"ISOLE CASHMERE DIOR","1256","Isole","BEIGE"],["MASTER APICOLOR AVORIO 0034","Master",5.0,1.79,7.15,"ISOLE CASHMERE DIOR","1256","Isole","BEIGE"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","WOOD BIS"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","WOOD BIS"],["MASTER MARRONE 809S","Master",4.0,1.25,5.0,"TROPEA ZEGNA","3722","Suola","WOOD BIS"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","WOOD BIS"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","WOOD BIS"],["MASTER MARRONE 809S","Master",4.0,1.25,"","TROPEA ZEGNA","3722","Spoiler","WOOD BIS"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","TORBA"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","TORBA"],["MASTER MARRONE 102T","Master",6.0,1.875,7.5,"TROPEA ZEGNA","3722","Suola","TORBA"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","TORBA"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","TORBA"],["MASTER MARRONE 102T","Master",6.0,1.875,"","TROPEA ZEGNA","3722","Spoiler","TORBA"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","PIETRA OASI"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","PIETRA OASI"],["MASTER GRIGIO 076T","Master",4.0,1.25,5.0,"TROPEA ZEGNA","3722","Suola","PIETRA OASI"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","PIETRA OASI"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","PIETRA OASI"],["MASTER GRIGIO 076T","Master",4.0,1.25,"","TROPEA ZEGNA","3722","Spoiler","PIETRA OASI"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","MIELE"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","MIELE"],["MASTER BEIGE 083T","Master",6.0,1.875,7.5,"TROPEA ZEGNA","3722","Suola","MIELE"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","MIELE"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","MIELE"],["MASTER BEIGE 083T","Master",6.0,1.875,"","TROPEA ZEGNA","3722","Spoiler","MIELE"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","GIANDUIA"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","GIANDUIA"],["MASTER MARRONE 070T","Master",3.0,0.94,3.75,"TROPEA ZEGNA","3722","Suola","GIANDUIA"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","GIANDUIA"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","GIANDUIA"],["MASTER MARRONE 070T","Master",3.0,0.94,"","TROPEA ZEGNA","3722","Spoiler","GIANDUIA"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","VELVET DENIM"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","VELVET DENIM"],["MASTER BLU 097T","Master",3.0,0.94,3.75,"TROPEA ZEGNA","3722","Suola","VELVET DENIM"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","VELVET DENIM"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","VELVET DENIM"],["MASTER BLU 097T","Master",3.0,0.94,"","TROPEA ZEGNA","3722","Spoiler","VELVET DENIM"],["REVOPURE 2085","Polimero",75.0,7.5,25.0,"DUPLO HERMES","","Inserto","NERO"],["REVOPURE 2065","Polimero",25.0,2.5,8.33,"DUPLO HERMES","","Inserto","NERO"],["MASTER NERO 215","Master",5.0,0.5,1.6,"DUPLO HERMES","","Inserto","NERO"],["DP3322/85A","Polimero",50.0,5.0,50.0,"DAY MASTER D&G","754","Inserto","NERO"],["DP3322/65A","Polimero",50.0,5.0,50.0,"DAY MASTER D&G","754","Inserto","NERO"],["MASTER NERO 215","Master",5.0,0.5,5.0,"DAY MASTER D&G","754","Inserto","NERO"],["APAN MF85","Polimero",100.0,25.0,100.0,"MARATHON SPEED GOLDEN GOOSE MF85","1220","Suola","AMBRA"],["MASTER PARA 316S","Master",5.0,1.25,5.0,"MARATHON SPEED GOLDEN GOOSE MF85","1220","Suola","AMBRA"],["APAN MF85","Polimero",100.0,25.0,100.0,"MARATHON SPEED GOLDEN GOOSE MF85","1220","Suola","NERO"],["MASTER NERO 215","Master",5.0,1.25,5.0,"MARATHON SPEED GOLDEN GOOSE MF85","1220","Suola","NERO"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","MELIGA"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","MELIGA"],["MASTER BEIGE 084T","Master",4.0,1.25,5.0,"TROPEA ZEGNA","3722","Suola","MELIGA"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","MELIGA"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","MELIGA"],["MASTER BEIGE 084T","Master",4.0,1.25,"","TROPEA ZEGNA","3722","Spoiler","MELIGA"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","ZAFFIRO"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","ZAFFIRO"],["MASTER BLU 082T","Master",4.0,1.25,5.0,"TROPEA ZEGNA","3722","Suola","ZAFFIRO"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","ZAFFIRO"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","ZAFFIRO"],["MASTER BLU 082T","Master",4.0,1.25,"","TROPEA ZEGNA","3722","Spoiler","ZAFFIRO"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","CIMA"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","CIMA"],["MASTER BEIGE 205S","Master",8.0,2.5,10.0,"TROPEA ZEGNA","3722","Suola","CIMA"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","CIMA"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","CIMA"],["MASTER BEIGE 205S","Master",8.0,2.5,"","TROPEA ZEGNA","3722","Spoiler","CIMA"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","NEBBIA"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","NEBBIA"],["MASTER GRIGIO 708T","Master",3.0,1.0,4.0,"TROPEA ZEGNA","3722","Suola","NEBBIA"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","NEBBIA"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","NEBBIA"],["MASTER GRIGIO 708T","Master",3.0,1.0,"","TROPEA ZEGNA","3722","Spoiler","NEBBIA"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","PEPE"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","PEPE"],["MASTER MARRONE 699T","Master",6.0,1.87,7.5,"TROPEA ZEGNA","3722","Suola","PEPE"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","PEPE"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","PEPE"],["MASTER MARRONE 699T","Master",6.0,1.87,"","TROPEA ZEGNA","3722","Spoiler","PEPE"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","TRAFALGAR BLU BIS"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","TRAFALGAR BLU BIS"],["MASTER BLU 702T","Master",4.0,1.25,5.0,"TROPEA ZEGNA","3722","Suola","TRAFALGAR BLU BIS"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","TRAFALGAR BLU BIS"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","TRAFALGAR BLU BIS"],["MASTER BLU 702T","Master",4.0,1.25,"","TROPEA ZEGNA","3722","Spoiler","TRAFALGAR BLU BIS"],["APILON 52 DP3322/85A","Polimero",50.0,25.0,100.0,"RYTHON GUCCI","Sport Gara","Suola","BEIGE"],["APILON 52 XB-75A LIGHT CRYSTAL","Polimero",50.0,25.0,100.0,"RYTHON GUCCI","Sport Gara","Suola","BEIGE"],["ANTIUV 03952","Additivo",2.0,1.0,4.0,"RYTHON GUCCI","Sport Gara","Suola","BEIGE"],["MASTER BEIGE 85959","Master",5.0,2.5,10.0,"RYTHON GUCCI","Sport Gara","Suola","BEIGE"],["APILON 52 DP3322/85A","Polimero",50.0,25.0,100.0,"RYTHON GUCCI","Sport Gara","Suola","NERO"],["APILON 52 XB-75A LIGHT CRYSTAL","Polimero",50.0,25.0,100.0,"RYTHON GUCCI","Sport Gara","Suola","NERO"],["MASTER NERO 215","Master",5.0,2.5,10.0,"RYTHON GUCCI","Sport Gara","Suola","NERO"],["REVOPURE PRM 75","Polimero",100.0,25.0,125.0,"NORA FENDI","1420","Suola","NERO"],["MASTER NERO 553","Master",3.0,0.75,3.75,"NORA FENDI","1420","Suola","NERO"],["REVOPURE RNW 75","Polimero",80.0,25.0,100.0,"NORA FENDI","1420","Suola","AMBRA NUT"],["DP3322/85A","Polimero",20.0,6.25,25.0,"NORA FENDI","1420","Suola","AMBRA NUT"],["MASTER AMBRA BW0125","Master",5.0,1.56,6.25,"NORA FENDI","1420","Suola","AMBRA NUT"],["DP3322/85A","Polimero",80.0,25.0,100.0,"NEW RUNNER ALEXANDER MCQUEEN","BATTISTRADA + TACCO BATTISTRADA","Suola e tacco","NERO"],["APAN TMP 75","Polimero",20.0,6.25,25.0,"NEW RUNNER ALEXANDER MCQUEEN","BATTISTRADA + TACCO BATTISTRADA","Suola e tacco","NERO"],["MASTER NERO 215","Master",5.0,1.56,6.25,"NEW RUNNER ALEXANDER MCQUEEN","BATTISTRADA + TACCO BATTISTRADA","Suola e tacco","NERO"],["DP3322/85A","Polimero",70.0,25.0,100.0,"SPOILER NEW RUNNER ALEXANDER MCQUEEN","BATTISTRADA + TACCO BATTISTRADA","Suola e tacco","BIANCO"],["DP3322/65A","Polimero",30.0,10.71,42.84,"SPOILER NEW RUNNER ALEXANDER MCQUEEN","BATTISTRADA + TACCO BATTISTRADA","Suola e tacco","BIANCO"],["MASTER BIANCO 19","Master",8.0,2.86,11.44,"SPOILER NEW RUNNER ALEXANDER MCQUEEN","BATTISTRADA + TACCO BATTISTRADA","Suola e tacco","BIANCO"],["APILON 52 DP3322/85A","Polimero",50.0,25.0,100.0,"RYTHON GUCCI","Sport Gara","Suola","WHITE BAMBOO"],["APILON 52 DP3322/65A","Polimero",50.0,25.0,100.0,"RYTHON GUCCI","Sport Gara","Suola","WHITE BAMBOO"],["MASTER BIANCO R996","Master",5.0,2.5,10.0,"RYTHON GUCCI","Sport Gara","Suola","WHITE BAMBOO"],["APILON 52 DP3322/85A","Polimero",50.0,25.0,100.0,"RYTHON GUCCI","Sport Gara","Suola","STEEL"],["APILON 52 DP3322/65A","Polimero",50.0,25.0,100.0,"RYTHON GUCCI","Sport Gara","Suola","STEEL"],["MASTER GRIGIO I239","Master",4.0,2.0,8.0,"RYTHON GUCCI","Sport Gara","Suola","STEEL"],["APILON 52 DP3322/85A","Polimero",50.0,25.0,100.0,"RYTHON GUCCI","Sport Gara","Suola","BUTTERSCOTCH"],["APILON 52 DP3322/65A","Polimero",50.0,25.0,100.0,"RYTHON GUCCI","Sport Gara","Suola","BUTTERSCOTCH"],["MASTER BEIGE 5104","Master",10.0,5.0,20.0,"RYTHON GUCCI","Sport Gara","Suola","BUTTERSCOTCH"],["APILON 52 DP3322/85A","Polimero",50.0,25.0,100.0,"RYTHON GUCCI","Sport Gara","Suola","BURN SATIN"],["APILON 52 DP3322/65A","Polimero",50.0,25.0,100.0,"RYTHON GUCCI","Sport Gara","Suola","BURN SATIN"],["MASTER MARRONE M420","Master",4.0,2.0,8.0,"RYTHON GUCCI","Sport Gara","Suola","BURN SATIN"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","CEDRO"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","CEDRO"],["MASTER MARRONE 357T","Master",6.0,1.87,7.5,"TROPEA ZEGNA","3722","Suola","CEDRO"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","CEDRO"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","CEDRO"],["MASTER MARRONE 357T","Master",6.0,1.87,"","TROPEA ZEGNA","3722","Spoiler","CEDRO"],["COIM LARIPUR 7518B","Polimero",80.0,25.0,100.0,"TROPEA ZEGNA","3722","Suola","ALGA"],["APILON 52 DP1805","Polimero",20.0,6.25,25.0,"TROPEA ZEGNA","3722","Suola","ALGA"],["MASTER VERDE 705T","Master",8.0,2.5,10.0,"TROPEA ZEGNA","3722","Suola","ALGA"],["COIM LARIPUR 8518B","Polimero",80.0,25.0,"","TROPEA ZEGNA","3722","Spoiler","ALGA"],["APILON 52 DP1805","Polimero",20.0,6.25,"","TROPEA ZEGNA","3722","Spoiler","ALGA"],["MASTER VERDE 705T","Master",8.0,2.5,"","TROPEA ZEGNA","3722","Spoiler","ALGA"],["REVOPURE PRM 75","Polimero",100.0,25.0,125.0,"NORA FENDI","1420","Suola","NERO TRASPARENTE"],["MASTER NERO 553","Master",3.0,0.75,3.75,"NORA FENDI","1420","Suola","NERO TRASPARENTE"],["REVOPURE RNW 75","Polimero",80.0,25.0,100.0,"NORA FENDI","1420","Suola","VERDE TRADSPARENTE"],["DP3322/85A","Polimero",20.0,6.25,25.0,"NORA FENDI","1420","Suola","VERDE TRADSPARENTE"],["MASTER AMBRA BW0125","Master",5.0,1.56,6.25,"NORA FENDI","1420","Suola","VERDE TRADSPARENTE"]]}};
+  var model = null, override = null;
+  var q = '', cf = '', qty = '', curArt = null, curVar = null, lastKey = null;
+  var msg = {t:'', err:false};
+  var nf = new Intl.NumberFormat('it-IT', {maximumFractionDigits:3});
+  var col = new Intl.Collator('it', {numeric:true, sensitivity:'base'});
+
+  function $(s){ return document.querySelector(s); }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function str(v){ return String(v == null ? '' : v).trim(); }
+  function num(x){ return x == null ? '—' : nf.format(x); }
+  function toNum(v){
+    if (typeof v === 'number') return isFinite(v) ? v : null;
+    if (typeof v !== 'string') return null;
+    var s = v.trim().replace(/[\s%]/g, '');
+    if (!s || !/^[-+]?[\d.,]+$/.test(s)) return null;
+    if (s.indexOf(',') > -1) s = s.replace(/\./g, '').replace(',', '.');
+    var n = Number(s);
+    return isFinite(n) ? n : null;
+  }
+  function round3(x){ return Math.round(x * 1000) / 1000; }
+
+  /* ---------- salvataggio locale (solo per file caricati) ---------- */
+  function loadStored(){
+    try {
+      var o = JSON.parse(localStorage.getItem(KEY));
+      if (o && o.R && o.M) return o;
+    } catch(e) {}
+    return null;
+  }
+  function saveStored(o){
+    try { localStorage.setItem(KEY, JSON.stringify(o)); return true; } catch(e) { return false; }
+  }
+  function clearStored(){ try { localStorage.removeItem(KEY); } catch(e) {} }
+
+  /* ---------- costruzione del modello ---------- */
+  function colIdx(h){
+    var o = {};
+    h.forEach(function(x, i){ o[String(x).trim().toLowerCase()] = i; });
+    return o;
+  }
+  function g(row, ix, name){
+    var i = ix[name.toLowerCase()];
+    return i === undefined || row[i] == null ? '' : row[i];
+  }
+  function mkey(a, p, c){ return [a, p, c].map(function(s){ return str(s).toLowerCase(); }).join('|'); }
+
+  function fillKg(rec){
+    var m = rec.mats;
+    if (!m.length || m.every(function(x){ return x.kg != null; })) return;
+    var pol = m.filter(function(x){ return x.role === 'Polimero' && x.pct; });
+    if (!pol.length) return;
+    var P = pol.reduce(function(a, x){ return a + x.pct; }, 0);
+    var T = 25 * P / pol[0].pct;
+    m.forEach(function(x){
+      if (x.kg == null && x.pct != null) {
+        x.kg = round3(x.role === 'Polimero' ? T * x.pct / P : T * x.pct / 100);
+        x.calc = true;
+      }
+    });
+  }
+
+  var SW = [['BIANCO','#F1F0EA'],['NERO','#1D1F22'],['GRIGIO','#8B939B'],['MARRONE','#6B4426'],['BEIGE','#D9C4A1'],
+            ['AVORIO','#EEE5CC'],['VERDE','#52794D'],['BLU','#2F5D9B'],['AMBRA','#C9861A'],['MIELE','#C99A3B']];
+  function swatchColor(grp){
+    var texts = [grp.recs[0].master, grp.recs[0].miscela, grp.colore];
+    for (var t = 0; t < texts.length; t++) {
+      var s = String(texts[t]).toUpperCase();
+      for (var i = 0; i < SW.length; i++) if (s.indexOf(SW[i][0]) > -1) return SW[i][1];
+    }
+    return '';
+  }
+  function swHtml(grp){
+    var c = swatchColor(grp);
+    return '<span class="sw' + (c ? '' : ' none') + '"' + (c ? ' style="background:' + c + '"' : '') + ' aria-hidden="true"></span>';
+  }
+
+  function build(R, M){
+    var ri = colIdx(R.headers), mi = colIdx(M.headers);
+    ['articolo', 'parte', 'colore'].forEach(function(k){
+      if (ri[k] === undefined) throw new Error('nel foglio Ricette manca la colonna “' + k + '”.');
+    });
+    ['materiale', 'articolo', 'parte', 'colore'].forEach(function(k){
+      if (mi[k] === undefined) throw new Error('nel foglio Materiali manca la colonna “' + k + '”.');
+    });
+    var mats = {};
+    M.rows.forEach(function(r){
+      var key = mkey(g(r, mi, 'Articolo'), g(r, mi, 'Parte'), g(r, mi, 'Colore'));
+      (mats[key] = mats[key] || []).push({
+        n: str(g(r, mi, 'Materiale')), role: str(g(r, mi, 'Ruolo')), pct: toNum(g(r, mi, '% in miscela')),
+        kg: toNum(g(r, mi, 'Kg (base)')), kgm: toNum(g(r, mi, 'Kg per miscelatore'))
+      });
+    });
+    var recs = [];
+    R.rows.forEach(function(r){
+      var art = str(g(r, ri, 'Articolo')), colore = str(g(r, ri, 'Colore'));
+      if (!art && !colore) return;
+      var rec = {
+        art: art, colore: colore, stampo: str(g(r, ri, 'Codice stampo')),
+        parte: str(g(r, ri, 'Parte')) || 'Suola', cod: str(g(r, ri, 'Cod. colore')),
+        brand: str(g(r, ri, 'Marca master')), master: str(g(r, ri, 'Master')), mpct: toNum(g(r, ri, '% master')),
+        miscela: str(g(r, ri, 'Miscela')), pesi: str(g(r, ri, 'Pesi (base)')), pesiMis: str(g(r, ri, 'Pesi per miscelatore')),
+        anom: str(g(r, ri, 'Anomalie')).split(' | ').map(function(s){ return s.trim(); }).filter(Boolean),
+        mats: (mats[mkey(art, g(r, ri, 'Parte'), colore)] || []).map(function(m){
+          return {n:m.n, role:m.role, pct:m.pct, kg:m.kg, kgm:m.kgm};
+        })
+      };
+      fillKg(rec);
+      recs.push(rec);
+    });
+    if (!recs.length) throw new Error('nel foglio Ricette non ci sono righe.');
+
+    var gm = {}, groups = [];
+    recs.forEach(function(rec){
+      var k = [rec.art, rec.colore, rec.cod].join('|').toLowerCase();
+      var grp = gm[k];
+      if (!grp) { grp = gm[k] = {art:rec.art, colore:rec.colore, cod:rec.cod, recs:[]}; groups.push(grp); }
+      grp.recs.push(rec);
+    });
+    groups.sort(function(a, b){ return col.compare(a.art, b.art) || col.compare(a.colore, b.colore); });
+    var am = {}, arts = [];
+    groups.forEach(function(grp, i){
+      grp.id = i;
+      var a = am[grp.art];
+      if (!a) { a = am[grp.art] = {name:grp.art, stampi:[], vars:[]}; arts.push(a); }
+      a.vars.push(grp);
+      grp.recs.forEach(function(r){ if (r.stampo && a.stampi.indexOf(r.stampo) === -1) a.stampi.push(r.stampo); });
+      grp.artObj = a;
+      grp.hay = [grp.art, grp.colore, grp.cod].concat(grp.recs.map(function(r){
+        return [r.parte, r.master, r.brand, r.mats.map(function(x){ return x.n; }).join(' ')].join(' ');
+      })).join(' ').toLowerCase();
+    });
+    arts.sort(function(a, b){ return col.compare(a.name, b.name); });
+    arts.forEach(function(a, i){ a.id = i; });
+    return {arts:arts, groups:groups, count:recs.length};
+  }
+
+  /* ---------- pezzi di pagina ---------- */
+  function partsLine(grp){ return grp.recs.map(function(r){ return r.parte; }).join(' · '); }
+  function vtile(grp, showArt){
+    var sub = (showArt ? grp.art + ' · ' : '') + (grp.cod ? grp.cod + ' · ' : '') + partsLine(grp);
+    return '<a class="vt" href="#v-' + grp.id + '">' + swHtml(grp) +
+      '<span class="vt-main"><span class="vt-name">' + esc(grp.colore || 'Senza nome') + '</span>' +
+      '<span class="vt-sub">' + esc(sub) + '</span></span></a>';
+  }
+  function tile(a){
+    return '<a class="tile" href="#a-' + a.id + '"><span class="t-name">' + esc(a.name) + '</span>' +
+      '<span class="t-meta">' + a.vars.length + (a.vars.length === 1 ? ' colore' : ' colori') +
+      (a.stampi.length ? ' · Stampo ' + esc(a.stampi.join(', ')) : '') + '</span></a>';
+  }
+  function adminHtml(){
+    return '<details class="admin"' + (msg.t ? ' open' : '') + '><summary>Aggiorna le ricette</summary><div class="admin-body">' +
+      '<p>Carica un file Excel con i fogli <strong>Ricette</strong> e <strong>Materiali</strong>, come Miscelazione_TPU_per_presse.xlsx. ' +
+      'Il file resta salvato solo su questo dispositivo.</p>' +
+      '<div class="row"><label class="btn" for="file">Scegli file Excel</label>' +
+      '<input class="sr" id="file" type="file" accept=".xlsx,.xls">' +
+      (override ? '<button type="button" class="btn ghost" data-act="reset">Torna alle ricette incluse</button>' : '') + '</div>' +
+      '<div class="status' + (msg.err ? ' err' : '') + '" role="status" aria-live="polite">' + esc(msg.t) + '</div></div></details>';
+  }
+  function renderFoot(){
+    var src = override
+      ? 'File caricato: ' + esc(override.name) + ' (' + new Date(override.added).toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'}) + ')'
+      : 'Fonte: documento MISCELAZIONE TPU PER PRESSE';
+    $('#foot').innerHTML = src + ' · ' + model.count + ' ricette';
+  }
+
+  /* ---------- viste ---------- */
+  function viewHome(){
+    $('#main').innerHTML =
+      '<section class="hero"><h1>Trova una ricetta</h1>' +
+      '<p class="sub">Scegli un articolo oppure cerca per colore, codice o materiale.</p>' +
+      '<label class="sr" for="q">Cerca</label>' +
+      '<input id="q" type="search" placeholder="Articolo, colore, codice o materiale" autocomplete="off" value="' + esc(q) + '"></section>' +
+      '<div id="hb"></div>' + adminHtml();
+    homeBody();
+  }
+  function homeBody(){
+    var el = $('#hb');
+    var terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+    if (!terms.length) {
+      el.innerHTML = '<h2 class="sec">Articoli</h2><div class="tiles">' + model.arts.map(tile).join('') + '</div>';
+      return;
+    }
+    var res = model.groups.filter(function(grp){
+      return terms.every(function(t){ return grp.hay.indexOf(t) > -1; });
+    });
+    if (!res.length) { el.innerHTML = '<p class="count">Nessuna ricetta trovata. Prova con meno parole.</p>'; return; }
+    var cap = res.slice(0, 80);
+    el.innerHTML = '<p class="count">' + res.length + (res.length === 1 ? ' ricetta trovata' : ' ricette trovate') +
+      (res.length > cap.length ? ' (mostrate le prime 80)' : '') + '</p>' +
+      '<div class="vgrid" style="margin-top:0">' + cap.map(function(grp){ return vtile(grp, true); }).join('') + '</div>';
+  }
+
+  function viewArticle(a){
+    curArt = a;
+    $('#main').innerHTML =
+      '<a class="back" href="#home">← Tutti gli articoli</a>' +
+      '<h1 class="h-art">' + esc(a.name) + '</h1>' +
+      '<p class="a-meta">' + a.vars.length + (a.vars.length === 1 ? ' colore' : ' colori') +
+      (a.stampi.length ? ' · Stampo ' + esc(a.stampi.join(', ')) : '') + '</p>' +
+      (a.vars.length > 8
+        ? '<label class="sr" for="cf">Filtra i colori</label><input id="cf" type="search" placeholder="Filtra i colori" autocomplete="off" value="' + esc(cf) + '">'
+        : '') +
+      '<div id="ab" class="vgrid"></div>';
+    articleBody();
+  }
+  function articleBody(){
+    var terms = cf.toLowerCase().split(/\s+/).filter(Boolean);
+    var list = curArt.vars.filter(function(grp){
+      var s = (grp.colore + ' ' + grp.cod).toLowerCase();
+      return terms.every(function(t){ return s.indexOf(t) > -1; });
+    });
+    $('#ab').innerHTML = list.length ? list.map(function(grp){ return vtile(grp, false); }).join('')
+      : '<p class="count">Nessun colore corrisponde.</p>';
+  }
+
+  function factor(m){
+    var X = toNum(qty);
+    if (!X || X <= 0 || !m.length || !m[0].kg) return null;
+    return X / m[0].kg;
+  }
+  function sum(list){
+    var t = 0;
+    for (var i = 0; i < list.length; i++) { if (list[i] == null) return null; t += list[i]; }
+    return round3(t);
+  }
+  function kgCell(label, v, calc){
+    return '<div class="nk"><span class="l">' + label + '</span>' +
+      (v == null ? '<span class="v">—</span>' : '<span class="v">' + num(v) + '</span><span class="u">kg</span>') +
+      (calc && v != null ? '<span class="calc-tag">calcolato</span>' : '') + '</div>';
+  }
+  function partHtml(rec){
+    var m = rec.mats, hasM = m.some(function(x){ return x.kgm != null; }), f = factor(m);
+    var labels = ['Base'];
+    if (hasM) labels.push('Miscelatore');
+    if (f) labels.push('Richiesti');
+    var h = '<section class="part"><div class="part-h"><h3>' + esc(rec.parte) + '</h3>' +
+      (rec.stampo ? '<span class="chip">Stampo ' + esc(rec.stampo) + '</span>' : '') + '</div>';
+    if (rec.master) {
+      h += '<div class="master"><div><div class="m-label">Master</div><div class="m-name">' + esc(rec.master) + '</div></div>' +
+        (rec.mpct != null ? '<div class="m-pct">' + nf.format(rec.mpct) + '%</div>' : '') + '</div>';
+    }
+    if (rec.anom.length) {
+      h += '<div class="alert" role="note"><strong>Da verificare sul documento originale</strong><ul>' +
+        rec.anom.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul></div>';
+    }
+    if (!m.length) {
+      h += '<p class="none">I materiali di questa ricetta non sono disponibili.</p>';
+    } else {
+      h += '<div class="mats" style="--n:' + labels.length + '"><div class="mrow head"><div class="mn">Materiale</div><div class="np">%</div>' +
+        labels.map(function(l){ return '<div class="nk">' + l + '</div>'; }).join('') + '</div>';
+      m.forEach(function(x){
+        var tag = x.role === 'Master' ? '<span class="tag">Master</span>' : (x.role === 'Additivo' ? '<span class="tag add">Additivo</span>' : '');
+        h += '<div class="mrow' + (x.role === 'Master' ? ' master-row' : '') + '"><div class="mn"><span class="mname">' + esc(x.n) + '</span>' + tag + '</div>' +
+          '<div class="np"><span class="l">Percentuale</span><span class="v">' + (x.pct == null ? '—' : nf.format(x.pct) + '%') + '</span></div>' +
+          kgCell('Base', x.kg, x.calc) +
+          (hasM ? kgCell('Miscelatore', x.kgm) : '') +
+          (f ? kgCell('Richiesti', x.kg == null ? null : round3(x.kg * f)) : '') + '</div>';
+      });
+      h += '<div class="mrow total"><div class="mn"><span class="mname">Totale</span></div><div class="np"></div>' +
+        kgCell('Base', sum(m.map(function(x){ return x.kg; }))) +
+        (hasM ? kgCell('Miscelatore', sum(m.map(function(x){ return x.kgm; }))) : '') +
+        (f ? kgCell('Richiesti', sum(m.map(function(x){ return x.kg == null ? null : x.kg * f; }))) : '') + '</div></div>';
+    }
+    h += '<details class="orig"><summary>Testo originale del documento</summary><dl>' +
+      '<dt>Miscela</dt><dd>' + esc(rec.miscela) + '</dd>' +
+      '<dt>Pesi</dt><dd>' + esc(rec.pesi) + '</dd>' +
+      (rec.pesiMis ? '<dt>Pesi per miscelatore</dt><dd>' + esc(rec.pesiMis) + '</dd>' : '') + '</dl></details></section>';
+    return h;
+  }
+  function viewVariant(grp){
+    curVar = grp;
+    $('#main').innerHTML =
+      '<a class="back" href="#a-' + grp.artObj.id + '">← ' + esc(grp.art) + '</a>' +
+      '<p class="eyebrow">' + esc(grp.art) + '</p>' +
+      '<h1 class="rtitle">' + swHtml(grp) + '<span>' + esc(grp.colore || 'Senza nome') + '</span>' +
+      (grp.cod ? '<span class="codechip">' + esc(grp.cod) + '</span>' : '') + '</h1>' +
+      '<div class="calc"><label for="qty">Altra quantità</label>' +
+      '<input id="qty" type="text" inputmode="decimal" placeholder="es. 40" autocomplete="off" value="' + esc(qty) + '">' +
+      '<span class="hint">kg del primo materiale della ricetta. Gli altri pesi si ricalcolano.</span></div>' +
+      '<div id="parts"></div>';
+    partsBody();
+  }
+  function partsBody(){
+    $('#parts').innerHTML = curVar.recs.map(partHtml).join('');
+  }
+
+  /* ---------- percorso ---------- */
+  function render(){
+    var h = location.hash.replace(/^#/, ''), m;
+    if ((m = /^a-(\d+)$/.exec(h)) && model.arts[+m[1]]) viewArticle(model.arts[+m[1]]);
+    else if ((m = /^v-(\d+)$/.exec(h)) && model.groups[+m[1]]) viewVariant(model.groups[+m[1]]);
+    else viewHome();
+    renderFoot();
+  }
+  function route(){
+    var h = location.hash.replace(/^#/, '');
+    if (h === lastKey) return;
+    lastKey = h;
+    cf = ''; qty = '';
+    render();
+    try { window.scrollTo(0, 0); } catch(e) {}
+  }
+  document.addEventListener('click', function(e){
+    var a = e.target.closest('a[href^="#"]');
+    if (a) { e.preventDefault(); location.hash = a.getAttribute('href').slice(1); route(); return; }
+    var b = e.target.closest('[data-act="reset"]');
+    if (b) {
+      clearStored(); override = null; model = build(SEED.R, SEED.M);
+      msg = {t:'Sono tornate le ricette incluse.', err:false}; q = ''; render();
+    }
+  });
+  window.addEventListener('hashchange', route);
+
+  document.addEventListener('input', function(e){
+    var id = e.target.id;
+    if (id === 'q') { q = e.target.value; homeBody(); }
+    else if (id === 'cf') { cf = e.target.value; articleBody(); }
+    else if (id === 'qty') { qty = e.target.value; partsBody(); }
+  });
+
+  /* ---------- aggiornamento da file ---------- */
+  function table(wb, name){
+    var key = null;
+    wb.SheetNames.forEach(function(n){ if (!key && n.trim().toLowerCase() === name.toLowerCase()) key = n; });
+    if (!key) return null;
+    var aoa = XLSX.utils.sheet_to_json(wb.Sheets[key], {header:1, raw:true, defval:'', blankrows:false});
+    if (aoa.length < 2) return null;
+    return {headers: aoa[0].map(function(h){ return String(h).trim(); }), rows: aoa.slice(1)};
+  }
+  function importFile(f){
+    if (typeof XLSX === 'undefined') {
+      msg = {t:'La libreria di lettura non si è caricata. Ricarica la pagina.', err:true}; render(); return;
+    }
+    f.arrayBuffer().then(function(buf){
+      var wb = XLSX.read(buf, {type:'array'});
+      var R = table(wb, 'Ricette'), M = table(wb, 'Materiali');
+      if (!R || !M) throw new Error('mancano i fogli “Ricette” e “Materiali”.');
+      var nm = build(R, M);
+      model = nm;
+      override = {R:R, M:M, name:f.name, added:Date.now()};
+      var ok = saveStored(override);
+      msg = {t:'Caricato ' + f.name + ': ' + nm.count + ' ricette.' + (ok ? '' : ' Il file è troppo grande per essere ricordato su questo dispositivo.'), err:!ok};
+      q = '';
+      if (location.hash.replace(/^#/, '') !== 'home') { location.hash = 'home'; lastKey = 'home'; }
+      render();
+    }).catch(function(err){
+      msg = {t:'File non letto: ' + (err && err.message ? err.message : 'formato non valido') , err:true};
+      render();
+    });
+  }
+  document.addEventListener('change', function(e){
+    if (e.target.id === 'file' && e.target.files && e.target.files[0]) {
+      var f = e.target.files[0];
+      e.target.value = '';
+      importFile(f);
+    }
+  });
+
+  /* ---------- avvio ---------- */
+  var stored = loadStored();
+  if (stored) {
+    try { model = build(stored.R, stored.M); override = stored; } catch(e) { model = null; }
+  }
+  if (!model) { model = build(SEED.R, SEED.M); override = null; }
+  lastKey = location.hash.replace(/^#/, '');
+  render();
+})();
+</script>
+
+</body></html>
